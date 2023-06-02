@@ -1,0 +1,27 @@
+.fluent-reveal {
+  --xBorderWidth: 1px;
+  --xBorderImage: none;
+  --xRadialGradient: none;
+  --xSplash: none;
+  position: relative;
+}
+
+.fluent-reveal::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: var(--xBorderWidth) solid transparent;
+  border-image: var(--xBorderImage);
+
+  background-image: var(--xRadialGradient), var(--xSplash);
+  background-origin: border-box;
+  transition: opacity 1.5s;
+  border-radius: inherit;
+  transform: translateZ(0);
+
+  pointer-events: none;
+  /* z-index: 1; */
+}
