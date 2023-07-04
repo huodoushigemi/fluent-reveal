@@ -46,14 +46,18 @@ export function useRevealEffect(el: HTMLElement, props = defProps) {
 
   // 按下
   const pressed = useMousePressed(el, async (val) => {
-    !ain.looping && ain.reset()
     if (val) {
-      ain.duration = 1000
-      // ain.source = 1
-      // ain.source = ain.looping ? 0 : 1
-      ain.source = 0
+      console.log(ain.looping);
+      if (ain.looping) {
+        ain.duration = 100
+        ain.source = 0
+      } else {
+        ain.reset()
+        ain.duration = 1000
+        ain.source = 1
+      }
     } else {
-      ain.duration = 1000
+      ain.duration = 400
       ain.source = 1
     }
   })
@@ -62,7 +66,7 @@ export function useRevealEffect(el: HTMLElement, props = defProps) {
   const ain = useTransition(0, {
     duration: 2000,
     // transition: [0, 0, 0.5, 0],
-    onTick: (v, r) => (update(), console.log(r))
+    onTick: () => update()
   })
   const gradient1 = [0, 25, 75]
   const gradient2 = [0, 75, 125]

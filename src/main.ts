@@ -3,6 +3,8 @@ import typescriptLogo from './typescript.svg'
 import viteLogo from '/vite.svg'
 import './observe.ts'
 
+import './card.ts'
+
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
     <div id="xxx">
@@ -19,6 +21,8 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       Click on the Vite and TypeScript logos to learn more
     </p>
   </div>
+
+  <wc-card><div>xxx</div></wc-card>
 `
 
 document.querySelector('#xxx').className = 'fluent-reveal'
