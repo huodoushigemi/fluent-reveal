@@ -1,27 +1,33 @@
-.fluent-reveal {
+[fluent-reveal='true'] {
   --xBorderWidth: 1px;
   --xBorderImage: none;
   --xRadialGradient: none;
   --xSplash: none;
+  --xSplashOp: 1;
   position: relative;
 }
 
-.fluent-reveal::after {
+[fluent-reveal='true']::before, [fluent-reveal='true']::after {
   content: '';
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
+  border-radius: inherit;
+  background-origin: border-box;
+  transform: translateZ(0);
+  pointer-events: none;
+  z-index: 1;
+}
+
+[fluent-reveal='true']::before {
   border: var(--xBorderWidth) solid transparent;
   border-image: var(--xBorderImage);
+  background-image: var(--xRadialGradient);
+}
 
-  background-image: var(--xRadialGradient), var(--xSplash);
-  background-origin: border-box;
-  transition: opacity 1.5s;
-  border-radius: inherit;
-  transform: translateZ(0);
-
-  pointer-events: none;
-  /* z-index: 1; */
+[fluent-reveal='true']::after {
+  background-image: var(--xSplash);
+  opacity: var(--xSplashOp);
 }

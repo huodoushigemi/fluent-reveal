@@ -1,18 +1,32 @@
 {
   "name": "fluent-reveal",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "unpkg": "dist/index.iife.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "rimraf dist/ && rollup -c",
     "preview": "vite preview"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/huodoushigemi/fluent-reveal.git"
+  },
   "devDependencies": {
+    "@loonguo/rollup-plugin-raw": "^0.0.5",
+    "rollup": "^4.6.0",
+    "rollup-plugin-esbuild": "^6.1.0",
+    "rollup-plugin-import-css": "^3.3.5",
+    "rollup-plugin-scss": "^4.0.0",
+    "sass": "^1.69.5",
     "typescript": "^5.0.2",
     "vite": "^4.3.2"
-  },
-  "dependencies": {
-    "@ctrl/tinycolor": "^3.6.0"
   }
 }

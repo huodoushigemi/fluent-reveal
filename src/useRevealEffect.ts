@@ -1,13 +1,13 @@
 import { useMouse, useMousePressed, useTransition } from './hooks'
 import { remove } from './util'
-import { TinyColor } from '@ctrl/tinycolor'
+// import { TinyColor } from '@ctrl/tinycolor'
 
-import { darkProps, defProps, lightProps, prefixCls, RevealEffectProps } from './interface'
+import { defProps, prefixCls, RevealEffectProps } from './interface'
 import './style.css'
 
 const queueMicro = (fn: () => void) => queueMicrotask ? queueMicrotask(fn) : Promise.resolve().then(fn)
 const computed = <T>(fn: () => T) => ({ get value() { return fn() } })
-const until = <T extends Record<string, any>>(arr: (T | undefined)[], k: keyof T) => arr.find(e => e && k in e)?.[k]
+const find = <T extends Record<any, any>, K extends keyof T>(arr: T[], k: K) => arr.find(e => e && k in e)?.[k]
 
 // 边缘检测
 function knock(px: number, py: number, rect: DOMRect, threshold = 0) {
@@ -42,12 +42,11 @@ export function setDefaultProps(props: RevealEffectProps) {
 export type UseRevealEffect = ReturnType<typeof useRevealEffect>
 
 export function useRevealEffect(el: HTMLElement, props = defProps) {
-  const ins = { el, update, mount, unmount }
-
+  const ins = { el, update, mount, unmount}
+  
   // 按下
-  const pressed = useMousePressed(el, async (val) => {
+  const pressed = useMousePressed(el, (val) => {
     if (val) {
-      console.log(ain.looping);
       if (ain.looping) {
         ain.duration = 100
         ain.source = 0
@@ -65,7 +64,6 @@ export function useRevealEffect(el: HTMLElement, props = defProps) {
   // 点击效果 动画
   const ain = useTransition(0, {
     duration: 2000,
-    // transition: [0, 0, 0.5, 0],
     onTick: () => update()
   })
   const gradient1 = [0, 25, 75]
@@ -76,15 +74,13 @@ export function useRevealEffect(el: HTMLElement, props = defProps) {
   let knockBorder = false
   let showRG = false
 
-  function update($props?: RevealEffectProps) {
+  function update() {
+    const _props = { ...defProps, ...props }
     const $px = px, $py = py
     const rect = el.getBoundingClientRect()
 
-    const colorModeProps = lightProps
-    let _props = $props ? (props = { ...defProps, ...$props }) : props
-    
-    const bc = until([props, colorModeProps], 'borderColor')
-    const bgc = until([props, colorModeProps], 'bgColor')
+    const bc = find([_props, defProps], 'borderColor')
+    const bgc = find([_props, defProps], 'bgColor')
 
     // border
     if (_props.borderWidth && knock($px, $py, rect, _props.borderGradientSize)) {
@@ -118,12 +114,20 @@ export function useRevealEffect(el: HTMLElement, props = defProps) {
       if (ain.looping && _props.clickEffect) {
         const low = 0.1
         const high = 1
-        const tcolor = new TinyColor(bgc)
-        const color = tcolor.setAlpha(tcolor.getAlpha() * (low + (high - low) * (1 - ain.value))).toHex8String()
-        const splash = `radial-gradient(${_props.bgGradientSize}px at ${x}px ${y}px, transparent ${gradient.value[0]}%, ${color} ${gradient.value[1]}%, transparent ${gradient.value[2]}%)`
-        queueMicro(() => el.style.setProperty(`--xSplash`, splash))
+        // const tcolor = new TinyColor(bgc)
+        // const color = tcolor.setAlpha(tcolor.getAlpha() * (low + (high - low) * (1 - ain.value))).toHex8String()
+        // const splash = `radial-gradient(${_props.bgGradientSize}px at ${x}px ${y}px, transparent ${gradient.value[0]}%, ${color} ${gradient.value[1]}%, transparent ${gradient.value[2]}%)`
+        const splash = `radial-gradient(${_props.bgGradientSize}px at ${x}px ${y}px, transparent ${gradient.value[0]}%, ${bgc} ${gradient.value[1]}%, transparent ${gradient.value[2]}%)`
+        const op = low + (high - low) * (1 - ain.value)
+        queueMicro(() => {
+          el.style.setProperty(`--xSplash`, splash)
+          el.style.setProperty(`--xSplashOp`, op + '')
+        })
       } else {
-        queueMicro(() => el.style.removeProperty(`--xSplash`))
+        queueMicro(() => {
+          el.style.removeProperty(`--xSplash`)
+          el.style.removeProperty(`--xSplashOp`)
+        })
       }
 
       showRG = true
@@ -134,7 +138,7 @@ export function useRevealEffect(el: HTMLElement, props = defProps) {
   }
 
   function removeBg() {
-    ;['xRadialGradient', 'xSplash'].forEach(e => {
+    ;['xRadialGradient', 'xSplash', 'xSplashOp'].forEach(e => {
       el.style.removeProperty(`--${e}`)
     })
   }
@@ -146,13 +150,18 @@ export function useRevealEffect(el: HTMLElement, props = defProps) {
 
   function mount() {
     list.includes(ins) || list.push(ins)
-    el.classList.add(prefixCls)
+    el.setAttribute('fluent-reveal', 'true')
+    knockP = { x: px, y: py }
+    pressed.enable()
+    update()
   }
   function unmount() {
     removeBg()
     removeBorder()
     remove(list, ins)
-    el.classList.remove(prefixCls)
+    pressed.disable()
+    ain.pause()
+    el.setAttribute('fluent-reveal', 'false')
   }
 
   mount()
